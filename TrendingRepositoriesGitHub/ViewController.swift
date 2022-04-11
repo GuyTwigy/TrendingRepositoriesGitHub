@@ -37,6 +37,9 @@ class ViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         
     }
+    @IBAction func favotiteListTapped(_ sender: Any) {
+        
+    }
     
     @IBAction func lastDayTapped(_ sender: Any){
         loader.startAnimating()
@@ -93,7 +96,6 @@ class ViewController: UIViewController {
                 self.loader.stopAnimating()
             }
         }
-        
     }
     
     func lastWeekRepos() {
@@ -180,6 +182,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                                 return
                             }
                             self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            tableView.reloadData()
                             self.loader.stopAnimating()
                         }
                     }
@@ -196,6 +199,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                                 return
                             }
                             self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            self.tableView.reloadData()
                             self.loader.stopAnimating()
                         }
                     }
@@ -212,6 +216,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                                 return
                             }
                             self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            self.tableView.reloadData()
                             self.loader.stopAnimating()
                         }
                     }
@@ -227,6 +232,9 @@ extension ViewController: ReposCellDelegate {
         if !favRepos.contains(where: {$0.html_url == repos[index].html_url}) {
             favRepos.append(repos[index])
             tableView.reloadData()
+        } else {
+            let alert = UIAlertController(title: "Already in list", message: "You can't add it again", preferredStyle: .alert)
+            self.present(alert, animated: true, completion: nil)
         }
     }
 }
