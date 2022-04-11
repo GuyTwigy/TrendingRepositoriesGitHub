@@ -14,32 +14,17 @@ enum ReposRange {
 }
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var loader: UIActivityIndicatorView!
+    
     var range: ReposRange?
     var isFavorite = false
-    var repos: [String] = ["first", "second", "Third", "forth", "fifth", " sixst", "sevent"]
-    var favRepos: [String] = []
+    var repos: [Items] = []
+    var favRepos: [Items] = []
+    var pageCounter = 1
     var titleName = String()
     var currentState: ReposRange = .lastDay
-    
-    @IBAction func lastDayTapped(_ sender: Any){
-        setState(state: .lastDay)
-        tableView.isHidden = false
-        tableView.reloadData()
-    }
-    
-    @IBAction func lastWeekTapped(_ sender: Any) {
-        setState(state: .lastWeek)
-        tableView.isHidden = false
-        tableView.reloadData()
-    }
-    
-    @IBAction func lastMonthTapped(_ sender: Any) {
-        setState(state: .LastMonth)
-        tableView.isHidden = false
-        tableView.reloadData()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,16 +33,35 @@ class ViewController: UIViewController {
         tableView.delegate = self
         tableView.register(UINib(nibName: ReposCell.nibName, bundle: nil), forCellReuseIdentifier: ReposCell.nibName)
         tableView.isHidden = true
+        tableView.estimatedRowHeight = 80
+        tableView.rowHeight = UITableView.automaticDimension
+        
+    }
+    
+    @IBAction func lastDayTapped(_ sender: Any){
+        loader.startAnimating()
+        setState(state: .lastDay)
+    }
+    
+    @IBAction func lastWeekTapped(_ sender: Any) {
+        loader.startAnimating()
+        setState(state: .lastWeek)
+        
+    }
+    
+    @IBAction func lastMonthTapped(_ sender: Any) {
+        loader.startAnimating()
+        setState(state: .LastMonth)
     }
     
     func setState(state: ReposRange) {
         switch state {
         case .lastDay:
-            getLastDayRepos()
+            yesterdayRepos()
         case .lastWeek:
-            getLastWeekRepos()
+            lastWeekRepos()
         case .LastMonth:
-            getLastMonthRepos()
+            lastMonthRepos()
         }
         currentState = state
     }
@@ -67,78 +71,163 @@ class ViewController: UIViewController {
             titleName = "Last Day Repositories"
         } else if currentState == .lastWeek {
             titleName = "Last Week Repositories"
-        } else {
+        } else if currentState == .LastMonth {
             titleName = "Last Month Repositories"
         }
     }
     
-    func getLastDayRepos() {
+    func yesterdayRepos() {
+        repos = []
+        pageCounter = 1
+        tableView.isHidden = false
+        UtilsNetworkManager.shared.getYesterdayRepositories { result, repositories in
+            guard let repositories = repositories else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
+                self.tableView.reloadData()
+                self.loader.stopAnimating()
+            }
+        }
         
     }
     
-    func getLastWeekRepos() {
+    func lastWeekRepos() {
+        repos = []
+        pageCounter = 1
+        tableView.isHidden = false
+        UtilsNetworkManager.shared.getLastWeekRepositories { result, repositories in
+            guard let repositories = repositories else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
+                self.tableView.reloadData()
+                self.loader.stopAnimating()
+            }
+        }
         
     }
     
-    func getLastMonthRepos() {
-        
+    func lastMonthRepos() {
+        repos = []
+        pageCounter = 1
+        tableView.isHidden = false
+        UtilsNetworkManager.shared.getLastMonthRepositories { result, repositories in
+            guard let repositories = repositories else {
+                return
+            }
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    return
+                }
+                self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
+                self.tableView.reloadData()
+                self.loader.stopAnimating()
+            }
+        }
     }
-    
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int {
-        2
-    }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
-            return "Favorits Repositories"
-        } else {
-            updateSectionTitle()
-            return titleName
-        }
+        updateSectionTitle()
+        return titleName
+        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return favRepos.count
-        } else {
-            return repos.count
-        }
+        return repos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ReposCell.nibName, for: indexPath) as! ReposCell
-        
-        if indexPath.section == 0 {
-            if favRepos.isEmpty {
-                
-            }
-        }
-        cell.repositoryName.text = repos[indexPath.row]
-        cell.updateCellContent()
+        cell.repos = repos
         cell.index = indexPath.row
+        cell.updateCellContent()
         cell.delegate = self
         
         return cell
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        220
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let repoDetails = RepositoryDetails()
+        repoDetails.repos = repos
+        repoDetails.index = indexPath.row
+        navigationController?.pushViewController(repoDetails, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if (indexPath.row == repos.count - 1 ) {
+            pageCounter += 1
+            if currentState == .lastDay {
+                loader.startAnimating()
+                UtilsNetworkManager.shared.getYesterdayRepositories(page: pageCounter) { result, repositories in
+                    DispatchQueue.main.async { [weak self] in
+                        guard let repositories = repositories else {
+                            return
+                        }
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else {
+                                return
+                            }
+                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            self.loader.stopAnimating()
+                        }
+                    }
+                }
+            } else if currentState == .lastWeek {
+                loader.startAnimating()
+                UtilsNetworkManager.shared.getLastWeekRepositories(page: pageCounter) { result, repositories in
+                    DispatchQueue.main.async { [weak self] in
+                        guard let repositories = repositories else {
+                            return
+                        }
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else {
+                                return
+                            }
+                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            self.loader.stopAnimating()
+                        }
+                    }
+                }
+            } else if currentState == .LastMonth {
+                loader.startAnimating()
+                UtilsNetworkManager.shared.getLastMonthRepositories(page: pageCounter) { result, repositories in
+                    DispatchQueue.main.async { [weak self] in
+                        guard let repositories = repositories else {
+                            return
+                        }
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else {
+                                return
+                            }
+                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+                            self.loader.stopAnimating()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
+
 extension ViewController: ReposCellDelegate {
-    func passData(isFavorite: Bool, _ index: Int) {
-        if isFavorite {
-            if !favRepos.contains(where: {$0 == repos[index]}) {
-                favRepos.append(repos[index])
-                tableView.reloadData()
-            }
-        } else if favRepos.contains(where: {$0 == repos[index]}) {
-            favRepos.removeAll(where: {$0 == repos[index]})
+    func passData(_ index: Int) {
+        if !favRepos.contains(where: {$0.html_url == repos[index].html_url}) {
+            favRepos.append(repos[index])
             tableView.reloadData()
         }
     }
 }
+
