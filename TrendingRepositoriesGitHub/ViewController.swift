@@ -37,8 +37,11 @@ class ViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         
     }
+    
     @IBAction func favotiteListTapped(_ sender: Any) {
-        
+        let favVC = FavoriteListVC()
+        favVC.favRepos = favRepos
+        navigationController?.pushViewController(favVC, animated: true)
     }
     
     @IBAction func lastDayTapped(_ sender: Any){
@@ -83,18 +86,8 @@ class ViewController: UIViewController {
         repos = []
         pageCounter = 1
         tableView.isHidden = false
-        UtilsNetworkManager.shared.getYesterdayRepositories { result, repositories in
-            guard let repositories = repositories else {
-                return
-            }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-                self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
-                self.tableView.reloadData()
-                self.loader.stopAnimating()
-            }
+        NetworkManager.shared.getYesterdayRepositories { result, repositories in
+            self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
         }
     }
     
@@ -102,37 +95,54 @@ class ViewController: UIViewController {
         repos = []
         pageCounter = 1
         tableView.isHidden = false
-        UtilsNetworkManager.shared.getLastWeekRepositories { result, repositories in
-            guard let repositories = repositories else {
-                return
-            }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
-                self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
-                self.tableView.reloadData()
-                self.loader.stopAnimating()
-            }
+        NetworkManager.shared.getLastWeekRepositories { result, repositories in
+            self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
         }
-        
     }
     
     func lastMonthRepos() {
         repos = []
         pageCounter = 1
         tableView.isHidden = false
-        UtilsNetworkManager.shared.getLastMonthRepositories { result, repositories in
-            guard let repositories = repositories else {
+        NetworkManager.shared.getLastMonthRepositories { result, repositories in
+            self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
+        }
+    }
+
+    func LoadDataNetWorkCall(repositories: [Items]?, firstLoad: Bool) {
+        guard let repositories = repositories else {
+            return
+        }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
                 return
             }
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else {
-                    return
-                }
+            if firstLoad {
                 self.repos = repositories.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
-                self.tableView.reloadData()
-                self.loader.stopAnimating()
+            } else {
+                self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
+            }
+            self.tableView.reloadData()
+            self.loader.stopAnimating()
+        }
+    }
+    
+    func loadMoreData() {
+        pageCounter += 1
+        if currentState == .lastDay {
+            loader.startAnimating()
+            NetworkManager.shared.getYesterdayRepositories(page: pageCounter) { result, repositories in
+                self.LoadDataNetWorkCall(repositories: repositories, firstLoad: false)
+            }
+        } else if currentState == .lastWeek {
+            loader.startAnimating()
+            NetworkManager.shared.getLastWeekRepositories(page: pageCounter) { result, repositories in
+                self.LoadDataNetWorkCall(repositories: repositories, firstLoad: false)
+            }
+        } else if currentState == .LastMonth {
+            loader.startAnimating()
+            NetworkManager.shared.getLastMonthRepositories(page: pageCounter) { result, repositories in
+                self.LoadDataNetWorkCall(repositories: repositories, firstLoad: false)
             }
         }
     }
@@ -169,59 +179,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if (indexPath.row == repos.count - 1 ) {
-            pageCounter += 1
-            if currentState == .lastDay {
-                loader.startAnimating()
-                UtilsNetworkManager.shared.getYesterdayRepositories(page: pageCounter) { result, repositories in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let repositories = repositories else {
-                            return
-                        }
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else {
-                                return
-                            }
-                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
-                            tableView.reloadData()
-                            self.loader.stopAnimating()
-                        }
-                    }
-                }
-            } else if currentState == .lastWeek {
-                loader.startAnimating()
-                UtilsNetworkManager.shared.getLastWeekRepositories(page: pageCounter) { result, repositories in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let repositories = repositories else {
-                            return
-                        }
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else {
-                                return
-                            }
-                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
-                            self.tableView.reloadData()
-                            self.loader.stopAnimating()
-                        }
-                    }
-                }
-            } else if currentState == .LastMonth {
-                loader.startAnimating()
-                UtilsNetworkManager.shared.getLastMonthRepositories(page: pageCounter) { result, repositories in
-                    DispatchQueue.main.async { [weak self] in
-                        guard let repositories = repositories else {
-                            return
-                        }
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else {
-                                return
-                            }
-                            self.repos.append(contentsOf: repositories.sorted(by:{$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0}))
-                            self.tableView.reloadData()
-                            self.loader.stopAnimating()
-                        }
-                    }
-                }
-            }
+        loadMoreData()
         }
     }
 }
@@ -229,13 +187,14 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 
 extension ViewController: ReposCellDelegate {
     func passData(_ index: Int) {
-        if !favRepos.contains(where: {$0.html_url == repos[index].html_url}) {
+        if !favRepos.contains(where: {$0.name == repos[index].name}) {
             favRepos.append(repos[index])
             tableView.reloadData()
         } else {
             let alert = UIAlertController(title: "Already in list", message: "You can't add it again", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
+            
         }
     }
 }
-
