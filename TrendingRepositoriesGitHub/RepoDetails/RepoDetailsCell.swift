@@ -10,17 +10,15 @@ import UIKit
 class RepoDetailsCell: UITableViewCell {
     
     static var nibName = "RepoDetailsCell"
+    
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var titleLabel: UILabel!
+    
     var index = Int()
     var indexPathRow = Int()
     var repos: [Items] = []
     var titles: [String] = []
-    var content : [String] = []
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
+    var content: [String] = []
     
     func updateContent() {
         titleLabel.text = titles[indexPathRow]

@@ -10,7 +10,6 @@ import UIKit
 class FavoriteListVC: UIViewController {
 
     var favRepos: [Items] = []
-    var UpdatedFavRepos: [Items] = []
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var noReposLabel: UILabel!
@@ -18,6 +17,9 @@ class FavoriteListVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let favoriteList = UserDefaults.standard.favListSave {
+            favRepos = favoriteList
+        }
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: ReposCell.nibName, bundle: nil), forCellReuseIdentifier: ReposCell.nibName)
@@ -37,10 +39,10 @@ class FavoriteListVC: UIViewController {
         }
         
         for item in favRepos {
-            if !UpdatedFavRepos.contains(where: {$0.name == item.name}) {
-                UpdatedFavRepos.append(item)
+            if !favRepos.contains(where: {$0.name == item.name}) {
+                favRepos.append(item)
             }
-            
+            UserDefaults.standard.favListSave = favRepos
         }
     }
 }
@@ -48,17 +50,34 @@ class FavoriteListVC: UIViewController {
 extension FavoriteListVC: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        UpdatedFavRepos.count
+        favRepos.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ReposCell.nibName, for: indexPath) as! ReposCell
         
         cell.favButton.isHidden = true
+        cell.removeButton.isHidden = false
         cell.index = indexPath.row
         cell.repos = favRepos
         cell.updateCellContent()
+        cell.delegateToFavorite = self
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let repoDetails = RepositoryDetails()
+        repoDetails.repos = favRepos
+        repoDetails.index = indexPath.row
+        navigationController?.pushViewController(repoDetails, animated: true)
+    }
+}
+
+extension FavoriteListVC: ReposCellDelegate {
+    func passData(_ index: Int) {
+        favRepos.remove(at: index)
+        UserDefaults.standard.favListSave = favRepos
+        tableView.reloadData()
     }
 }

@@ -11,15 +11,15 @@ struct ResponseRepositories: Decodable {
     let repositories: Repositories
 }
 
-struct Repositories: Decodable {
+struct Repositories: Codable {
     let total_count: Int?
     let incomplete_results: Bool
     let items: [Items]?
 }
 
-struct Items: Decodable {
+struct Items: Codable {
     let name: String?
-    let owner: Owner?
+    let owner: Owner
     let html_url: String?
     let description: String?
     let created_at: String?
@@ -28,8 +28,8 @@ struct Items: Decodable {
     let forks: Int?
 }
 
-struct Owner: Decodable {
-    let login: String?
+struct Owner: Codable {
+    let login: String
     let avatar_url: String?
 }
 

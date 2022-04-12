@@ -18,8 +18,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var loader: UIActivityIndicatorView!
     
-    var range: ReposRange?
-    var isFavorite = false
     var repos: [Items] = []
     var favRepos: [Items] = []
     var pageCounter = 1
@@ -29,18 +27,19 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let favoriteList = UserDefaults.standard.favListSave {
+            favRepos = favoriteList
+        }
         tableView.dataSource = self
         tableView.delegate = self
         tableView.register(UINib(nibName: ReposCell.nibName, bundle: nil), forCellReuseIdentifier: ReposCell.nibName)
         tableView.isHidden = true
         tableView.estimatedRowHeight = 80
         tableView.rowHeight = UITableView.automaticDimension
-        
     }
     
     @IBAction func favotiteListTapped(_ sender: Any) {
         let favVC = FavoriteListVC()
-        favVC.favRepos = favRepos
         navigationController?.pushViewController(favVC, animated: true)
     }
     
@@ -153,7 +152,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         updateSectionTitle()
         return titleName
-        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -165,7 +163,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.repos = repos
         cell.index = indexPath.row
         cell.updateCellContent()
-        cell.delegate = self
+        cell.delegateToVC = self
         
         return cell
     }
@@ -189,6 +187,7 @@ extension ViewController: ReposCellDelegate {
     func passData(_ index: Int) {
         if !favRepos.contains(where: {$0.name == repos[index].name}) {
             favRepos.append(repos[index])
+            UserDefaults.standard.favListSave = favRepos
             tableView.reloadData()
         } else {
             let alert = UIAlertController(title: "Already in list", message: "You can't add it again", preferredStyle: .alert)

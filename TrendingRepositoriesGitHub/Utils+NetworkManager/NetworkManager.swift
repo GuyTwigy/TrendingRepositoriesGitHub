@@ -29,10 +29,10 @@ class NetworkManager {
             }
             do {
                 let response = try JSONDecoder().decode(Repositories.self, from: data)
-                return callBack(true, response.items)
+                callBack(true, response.items)
             } catch {
                 print("Failure to load Repositories")
-                return callBack(false, nil)
+                callBack(false, nil)
             }
         }
         task.resume()
@@ -55,10 +55,10 @@ class NetworkManager {
             }
             do {
                 let response = try JSONDecoder().decode(Repositories.self, from: data)
-                return callBack(true, response.items)
+                callBack(true, response.items)
             } catch {
                 print("Failure to load Repositories")
-                return callBack(false, nil)
+                callBack(false, nil)
             }
         }
         task.resume()
@@ -81,10 +81,10 @@ class NetworkManager {
             }
             do {
                 let response = try JSONDecoder().decode(Repositories.self, from: data)
-                return callBack(true, response.items)
+                callBack(true, response.items)
             } catch {
                 print("Failure to load Repositories")
-                return callBack(false, nil)
+                callBack(false, nil)
             }
         }
         task.resume()
