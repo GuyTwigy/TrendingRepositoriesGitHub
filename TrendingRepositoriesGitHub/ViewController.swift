@@ -164,7 +164,14 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         cell.index = indexPath.row
         cell.updateCellContent()
         cell.delegateToVC = self
-        
+        cell.isFav = favRepos.contains(where: {$0.name == repos[indexPath.row].name})
+        if cell.isFav {
+            cell.favButton.isHidden = true
+            cell.addedLabel.isHidden = false
+        } else {
+            cell.favButton.isHidden = false
+            cell.addedLabel.isHidden = true
+        }
         return cell
     }
     
@@ -193,7 +200,6 @@ extension ViewController: ReposCellDelegate {
             let alert = UIAlertController(title: "Already in list", message: "You can't add it again", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
-            
         }
     }
 }

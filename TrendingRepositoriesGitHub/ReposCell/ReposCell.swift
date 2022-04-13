@@ -32,8 +32,6 @@ class ReposCell : UITableViewCell {
     
     
     @IBAction func favTapped(_ sender: Any) {
-        favButton.isHidden = true
-        addedLabel.isHidden = false
         delegateToVC?.passData(index)
     }
     
