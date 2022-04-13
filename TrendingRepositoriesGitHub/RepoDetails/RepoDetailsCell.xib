@@ -18,13 +18,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xjm-Db-tnf">
-                        <rect key="frame" x="16" y="47" width="48" height="24"/>
+                        <rect key="frame" x="16" y="29.5" width="48" height="24"/>
                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="Lorem ipsum dolor sit er elit " textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="lEj-59-I1k">
-                        <rect key="frame" x="79" y="25" width="236" height="83"/>
+                        <rect key="frame" x="20" y="53.5" width="295" height="54.5"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="textColor" systemColor="labelColor"/>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
@@ -33,12 +33,12 @@
                     </textView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="xjm-Db-tnf" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="BoI-pj-L4v"/>
+                    <constraint firstItem="xjm-Db-tnf" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" multiplier="0.7" id="BoI-pj-L4v"/>
                     <constraint firstAttribute="trailing" secondItem="lEj-59-I1k" secondAttribute="trailing" constant="5" id="Q9T-1u-kYr"/>
                     <constraint firstItem="xjm-Db-tnf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="V6q-uV-sd3"/>
-                    <constraint firstItem="lEj-59-I1k" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="25" id="fQL-lJ-hNL"/>
-                    <constraint firstItem="lEj-59-I1k" firstAttribute="leading" secondItem="xjm-Db-tnf" secondAttribute="trailing" constant="15" id="gc7-zR-XiM"/>
+                    <constraint firstItem="lEj-59-I1k" firstAttribute="top" secondItem="xjm-Db-tnf" secondAttribute="bottom" id="dOg-0T-umV"/>
                     <constraint firstAttribute="bottom" secondItem="lEj-59-I1k" secondAttribute="bottom" constant="10" id="tLf-T6-2dL"/>
+                    <constraint firstItem="lEj-59-I1k" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="yXK-Rh-M3i"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -46,7 +46,7 @@
                 <outlet property="textView" destination="lEj-59-I1k" id="n9J-Ar-TYj"/>
                 <outlet property="titleLabel" destination="xjm-Db-tnf" id="pjE-UE-d1d"/>
             </connections>
-            <point key="canvasLocation" x="137.68115942028987" y="142.63392857142856"/>
+            <point key="canvasLocation" x="137.68115942028987" y="141.96428571428569"/>
         </tableViewCell>
     </objects>
     <resources>

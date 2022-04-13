@@ -9,7 +9,7 @@ import Foundation
 
 class UtilsNetworkManager {
 
-    static var shared = UtilsNetworkManager()
+    static let shared = UtilsNetworkManager()
     
     func getTodayDate() -> String {
         let todayDate = Calendar(identifier: .iso8601).date(byAdding: .second, value: -1, to: Date())!

@@ -24,6 +24,7 @@
 		9D9AA2F528047FC20051B7C6 /* ExtensionUserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AA2F428047FC20051B7C6 /* ExtensionUserDefault.swift */; };
 		9D9AA2F9280480430051B7C6 /* ExtensionUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AA2F8280480430051B7C6 /* ExtensionUIButton.swift */; };
 		9D9AA2FB2804A1770051B7C6 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AA2FA2804A1770051B7C6 /* NetworkManager.swift */; };
+		9D9AA300280645EF0051B7C6 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9AA2FF280645EF0051B7C6 /* NetworkMonitor.swift */; };
 		9DE205C62803839100C96E3C /* ExtensionUIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE205C52803839100C96E3C /* ExtensionUIImage.swift */; };
 		9DE205CA2803956C00C96E3C /* RepositoryDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE205C82803956C00C96E3C /* RepositoryDetails.swift */; };
 		9DE205CB2803956C00C96E3C /* RepositoryDetails.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9DE205C92803956C00C96E3C /* RepositoryDetails.xib */; };
@@ -49,6 +50,7 @@
 		9D9AA2F428047FC20051B7C6 /* ExtensionUserDefault.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtensionUserDefault.swift; path = ../../../../Documents/ExtensionUserDefault.swift; sourceTree = "<group>"; };
 		9D9AA2F8280480430051B7C6 /* ExtensionUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionUIButton.swift; sourceTree = "<group>"; };
 		9D9AA2FA2804A1770051B7C6 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		9D9AA2FF280645EF0051B7C6 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		9DE205C52803839100C96E3C /* ExtensionUIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionUIImage.swift; sourceTree = "<group>"; };
 		9DE205C82803956C00C96E3C /* RepositoryDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryDetails.swift; sourceTree = "<group>"; };
 		9DE205C92803956C00C96E3C /* RepositoryDetails.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RepositoryDetails.xib; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				9D1CDC1C28008796008E51EF /* SceneDelegate.swift */,
 				9D1CDC1E28008796008E51EF /* ViewController.swift */,
 				9D1CDC2028008796008E51EF /* Main.storyboard */,
+				9D9AA2FF280645EF0051B7C6 /* NetworkMonitor.swift */,
 				9D8923FA28044321004C0D10 /* Utils+NetworkManager */,
 				9D8923F4280442AB004C0D10 /* Models */,
 				9D8923F328044294004C0D10 /* Extensions */,
@@ -245,6 +248,7 @@
 				9D1CDC3028030700008E51EF /* ReposCell.swift in Sources */,
 				9D1CDC3628036221008E51EF /* RepositoriesModel.swift in Sources */,
 				9DE205C62803839100C96E3C /* ExtensionUIImage.swift in Sources */,
+				9D9AA300280645EF0051B7C6 /* NetworkMonitor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,6 +17,7 @@ class FavoriteListVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        sortArray()
         if let favoriteList = UserDefaults.standard.favListSave {
             favRepos = favoriteList
         }
@@ -31,9 +32,15 @@ class FavoriteListVC: UIViewController {
         setContent()
     }
     
+    func sortArray() {
+        let temp = favRepos.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
+        favRepos = temp
+    }
+    
     func setContent() {
         if favRepos.isEmpty {
             tableView.isHidden = true
+            noReposLabel.isHidden = false
         } else {
             noReposLabel.isHidden = true
         }
@@ -42,6 +49,7 @@ class FavoriteListVC: UIViewController {
             if !favRepos.contains(where: {$0.name == item.name}) {
                 favRepos.append(item)
             }
+            sortArray()
             UserDefaults.standard.favListSave = favRepos
         }
     }
@@ -77,7 +85,10 @@ extension FavoriteListVC: UITableViewDataSource, UITableViewDelegate {
 extension FavoriteListVC: ReposCellDelegate {
     func passData(_ index: Int) {
         favRepos.remove(at: index)
-        UserDefaults.standard.favListSave = favRepos
+        if favRepos.isEmpty {
+            noReposLabel.isHidden = false
+        }
         tableView.reloadData()
+        UserDefaults.standard.favListSave = favRepos
     }
 }
