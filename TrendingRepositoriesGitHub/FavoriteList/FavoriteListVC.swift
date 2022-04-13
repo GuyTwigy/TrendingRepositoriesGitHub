@@ -32,6 +32,11 @@ class FavoriteListVC: UIViewController {
         setContent()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        alertNoInternetConnection()
+    }
+    
     func sortArray() {
         let temp = favRepos.sorted(by: {$0.stargazers_count ?? 0 > $1.stargazers_count ?? 0})
         favRepos = temp
@@ -51,6 +56,12 @@ class FavoriteListVC: UIViewController {
             }
             sortArray()
             UserDefaults.standard.favListSave = favRepos
+        }
+    }
+    
+    func alertNoInternetConnection() {
+        if !NetworkMonitor.shared.isConnnected {
+            presentAlert(withTitle: "No Internet Connection", message: "Please check your connetion")
         }
     }
 }

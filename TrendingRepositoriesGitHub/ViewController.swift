@@ -38,6 +38,11 @@ class ViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        alertNoInternetConnection()
+    }
+    
     @IBAction func favotiteListTapped(_ sender: Any) {
         let favVC = FavoriteListVC()
         navigationController?.pushViewController(favVC, animated: true)
@@ -82,32 +87,26 @@ class ViewController: UIViewController {
     }
     
     func yesterdayRepos() {
-        repos = []
-        pageCounter = 1
-        tableView.isHidden = false
+        setupBeforeForRequest()
         NetworkManager.shared.getYesterdayRepositories { result, repositories in
             self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
         }
     }
     
     func lastWeekRepos() {
-        repos = []
-        pageCounter = 1
-        tableView.isHidden = false
+        setupBeforeForRequest()
         NetworkManager.shared.getLastWeekRepositories { result, repositories in
             self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
         }
     }
     
     func lastMonthRepos() {
-        repos = []
-        pageCounter = 1
-        tableView.isHidden = false
+        setupBeforeForRequest()
         NetworkManager.shared.getLastMonthRepositories { result, repositories in
             self.LoadDataNetWorkCall(repositories: repositories, firstLoad: true)
         }
     }
-
+    
     func LoadDataNetWorkCall(repositories: [Items]?, firstLoad: Bool) {
         guard let repositories = repositories else {
             return
@@ -126,7 +125,16 @@ class ViewController: UIViewController {
         }
     }
     
+    func setupBeforeForRequest() {
+        alertNoInternetConnectionForRequest()
+        repos = []
+        pageCounter = 1
+        tableView.isHidden = false
+        tableView.isUserInteractionEnabled = true
+    }
+    
     func loadMoreData() {
+        alertNoInternetConnectionForRequest()
         pageCounter += 1
         if currentState == .lastDay {
             loader.startAnimating()
@@ -143,6 +151,20 @@ class ViewController: UIViewController {
             NetworkManager.shared.getLastMonthRepositories(page: pageCounter) { result, repositories in
                 self.LoadDataNetWorkCall(repositories: repositories, firstLoad: false)
             }
+        }
+    }
+    
+    func alertNoInternetConnection() {
+        if !NetworkMonitor.shared.isConnnected {
+            presentAlert(withTitle: "No Internet Connection", message: "Please check your connetion")
+            loader.stopAnimating()
+        }
+    }
+    
+    func alertNoInternetConnectionForRequest() {
+        if !NetworkMonitor.shared.isConnnected {
+            presentAlert(withTitle: "Request Failed", message: "Can't make the request deu to connection issue")
+            loader.stopAnimating()
         }
     }
 }
@@ -184,7 +206,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if (indexPath.row == repos.count - 1 ) {
-        loadMoreData()
+            loadMoreData()
         }
     }
 }
@@ -196,10 +218,6 @@ extension ViewController: ReposCellDelegate {
             favRepos.append(repos[index])
             UserDefaults.standard.favListSave = favRepos
             tableView.reloadData()
-        } else {
-            let alert = UIAlertController(title: "Already in list", message: "You can't add it again", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
         }
     }
 }

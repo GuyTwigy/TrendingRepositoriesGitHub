@@ -36,8 +36,10 @@ class NetworkMonitor {
             guard let self = self  else {
                 return
             }
-            self.isConnnected = path.status != .unsatisfied
-            self.getConnectionType(path)
+            DispatchQueue.main.async {
+                self.isConnnected = path.status != .unsatisfied
+                self.getConnectionType(path)
+            }
         }
     }
     
